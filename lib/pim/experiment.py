@@ -35,6 +35,7 @@ class ExperimentResults:
             pickle.dump(output, f)
         logger.info("saved experiment results as {}", filename)
 
+
 class Experiment:
     @abstractmethod
     def run(self, name: str, config_id: str) -> ExperimentResults:

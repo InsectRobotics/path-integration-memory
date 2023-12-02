@@ -26,6 +26,7 @@ def deep_update(obj: dict, path: str, value: str):
         t = type(obj[key])
         obj[key] = t(value)
 
+
 def run_experiment(args):
     if args.slow_ode:
         pim.math.slow_solver = True

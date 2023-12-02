@@ -83,6 +83,7 @@ class MemorylessCPU4Layer(Layer):
             mem_update -= np.dot(self.W_TB1, tb1)
             return np.clip(noisy_sigmoid(mem_update, self.slope, self.bias, self.noise) * self.gain + beta, 0, 1)
 
+
 class CPU4Layer(Layer):
     def __init__(self, TB1, TN1, TN2, W_TN, W_TB1, gain, slope, bias, noise, holonomic=False):
         self.TB1 = TB1
@@ -120,6 +121,7 @@ class CPU4Layer(Layer):
         return noisy_sigmoid(self.memory, self.slope,
                              self.bias, self.noise)
 
+
 class CPU4PontineLayer(CPU4Layer):
     def internal(self):
         return [self.memory, self.memory]
@@ -147,6 +149,7 @@ class CPU4PontineLayer(CPU4Layer):
             # mem_update = mem_update.reshape(-1)
             cpu4_mem_reshaped += self.gain * mem_update
             self.memory = np.clip(cpu4_mem_reshaped.reshape(-1), 0.0, 1.0)
+
 
 W_CL1_TB1 = np.tile(np.eye(N_TB1), 2)
 W_TB1_TB1 = gen_tb_tb_weights()
@@ -206,6 +209,7 @@ W_pontine_CPU1b = np.array([
 ])
 W_CPU4_pontine = np.eye(N_CPU4)
 
+
 def tl2_output(noise):
     """Just a dot product with preferred angle and current heading""" # bad description
     def f(inputs):
@@ -214,12 +218,14 @@ def tl2_output(noise):
         return noisy_sigmoid(output, tl2_slope_tuned, tl2_bias_tuned, noise)
     return f
 
+
 def cl1_output(noise):
     """Takes input from the TL2 neurons and gives output."""
     def f(inputs):
         tl2, = inputs
         return noisy_sigmoid(-tl2, cl1_slope_tuned, cl1_bias_tuned, noise)
     return f
+
 
 def tb1_output(noise):
     """Ring attractor state on the protocerebral bridge."""
@@ -232,6 +238,7 @@ def tb1_output(noise):
         return noisy_sigmoid(output, tb1_slope_tuned, tb1_bias_tuned, noise)
     return f
 
+
 def tn1_output(noise):
     def f(inputs):
         flow, = inputs
@@ -240,6 +247,7 @@ def tn1_output(noise):
             output += np.random.normal(scale=noise, size=flow.shape)
         return np.clip(output, 0.0, 1.0)
     return f
+
 
 def tn2_output(noise):
     def f(inputs):
@@ -250,6 +258,7 @@ def tn2_output(noise):
         return np.clip(output, 0.0, 1.0)
     return f
 
+
 def cpu1a_output(noise):
     def f(inputs):
         """The memory and direction used together to get population code for
@@ -258,6 +267,7 @@ def cpu1a_output(noise):
         inputs = np.dot(W_CPU4_CPU1a, cpu4) * np.dot(W_TB1_CPU1a, 1.0-tb1)
         return noisy_sigmoid(inputs, cpu1_slope_tuned, cpu1_bias_tuned, noise)
     return f
+
 
 def cpu1b_output(noise):
     def f(inputs):
@@ -276,6 +286,7 @@ def cpu1b_output(noise):
 #        return np.hstack([cpu1b[-1], cpu1a, cpu1b[0]])
 #    return f
 
+
 def motor_output(noise):
     """outputs a scalar where sign determines left or right turn."""
     def f(inputs):
@@ -286,12 +297,14 @@ def motor_output(noise):
         return output
     return f
 
+
 def pontine_output(noise):
     def f(inputs):
         cpu4, = inputs
         inputs = np.dot(W_CPU4_pontine, cpu4)
         return noisy_sigmoid(inputs, pontine_slope_tuned, pontine_bias_tuned, noise)
     return f
+
 
 def cpu1a_pontine_output(noise):
     def f(inputs):
@@ -307,6 +320,7 @@ def cpu1a_pontine_output(noise):
         return noisy_sigmoid(inputs, cpu1_pontine_slope_tuned, cpu1_pontine_bias_tuned, noise)
     return f
 
+
 def cpu1b_pontine_output(noise):
     def f(inputs):
         """The memory and direction used together to get population code for
@@ -320,7 +334,6 @@ def cpu1b_pontine_output(noise):
 
         return noisy_sigmoid(inputs, cpu1_pontine_slope_tuned, cpu1_pontine_bias_tuned, noise)
     return f
-
 
 
 def build_network(params, CPU4LayerClass = CPU4Layer) -> Network:
@@ -380,6 +393,7 @@ def build_network(params, CPU4LayerClass = CPU4Layer) -> Network:
             function = motor_output(noise),
         )
     })
+
 
 def build_network_pontine(params) -> Network:
     # TODO: allow noisy weights

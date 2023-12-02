@@ -4,25 +4,30 @@ import numpy as np
 from ..network import InputLayer, Network, Output, RecurrentForwardNetwork, FunctionLayer, IdentityLayer, Layer
 from .constants import *
 
+
 def cl1_output(inputs):
     "Invert compass"
     tl2, = inputs
     return tl2 + np.pi
+
 
 def tb1_output(inputs):
     """Sinusoidal response to solar compass."""
     cl1, tb1 = inputs
     return (1.0 + np.cos(cl1 - column_angles)) / 2.0
 
+
 def tn1_output(inputs):
     """Linearly inverse sensitive to forwards and backwards motion."""
     flow, = inputs
     return np.clip((1.0 - flow) / 2.0, 0, 1)
 
+
 def tn2_output(inputs):
     """Linearly sensitive to forwards motion only."""
     flow, = inputs
     return np.clip(flow, 0, 1)
+
 
 class CPU4Layer(Layer):
     def __init__(self, TB1, TN1, TN2, gain):
@@ -64,6 +69,7 @@ class CPU4Layer(Layer):
     def output(self, dt: float) -> Output:
         return self.memory
 
+
 def cpu1_output(inputs):
     tb1, cpu4 = inputs
     """Offset CPU4 columns by 1 column (45 degrees) left and right
@@ -73,6 +79,7 @@ def cpu1_output(inputs):
     cpu1 = (1.0 - tb1) * np.vstack([np.roll(cpu4_reshaped[1], 1),
                                     np.roll(cpu4_reshaped[0], -1)])
     return cpu1.reshape(-1)
+
 
 def motor_output(inputs):
     cpu1, = inputs

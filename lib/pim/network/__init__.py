@@ -13,7 +13,7 @@ class Network:
         some network types (such as the forward network) relies on the order of this dictionary,
         which is a reliable property of dictionaries since Python 3.7."""
         self.layers = layers
-        self.context = None # type: Any
+        self.context = None  # type: Any
 
     def reset(self):
         for name, layer in self.layers.items():
@@ -82,6 +82,7 @@ class RecurrentNetwork(Network):
     def output(self, layer) -> Output:
         return self._previous_outputs[layer]
 
+
 class RecurrentForwardNetwork(Network):
     """Forward network that allows backward connections."""
 
@@ -144,7 +145,7 @@ class WeightedSynapse(Synapse):
 
 
 class Layer:
-    def __init__(self, initial = np.array([0.0])):
+    def __init__(self, initial=np.array([0.0])):
         self.initial = initial
         self.reset()
 
@@ -198,7 +199,7 @@ def IdentityLayer(input):
 
 
 class InputLayer(Layer):
-    def __init__(self, initial = np.array([0.0])):
+    def __init__(self, initial=np.array([0.0])):
         super().__init__(initial)
         self.input = Trap()
 
